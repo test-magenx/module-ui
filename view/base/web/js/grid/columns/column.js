@@ -303,16 +303,6 @@ define([
         },
 
         /**
-         * UnsanitizedHtml version of getLabel.
-         *
-         * @param {Object} record - Data to be preprocessed.
-         * @returns {String}
-         */
-        getLabelUnsanitizedHtml: function (record) {
-            return this.getLabel(record);
-        },
-
-        /**
          * Returns list of classes that should be applied to a field.
          *
          * @returns {Object}

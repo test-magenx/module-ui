@@ -27,7 +27,7 @@ class ListingTest extends TestCase
     protected $objectManager;
 
     /**
-     * @inheritdoc
+     * Set up
      */
     protected function setUp(): void
     {
@@ -46,7 +46,7 @@ class ListingTest extends TestCase
      *
      * @return void
      */
-    public function testGetComponentName(): void
+    public function testGetComponentName()
     {
         $this->contextMock->expects($this->never())->method('getProcessor');
         /** @var Listing $listing */
@@ -66,7 +66,7 @@ class ListingTest extends TestCase
      *
      * @return void
      */
-    public function testPrepare(): void
+    public function testPrepare()
     {
         $processor = $this->getMockBuilder(Processor::class)
             ->disableOriginalConstructor()
@@ -84,14 +84,14 @@ class ListingTest extends TestCase
                 'data' => [
                     'js_config' => [
                         'extends' => 'test_config_extends',
-                        'testData' => 'testValue'
+                        'testData' => 'testValue',
                     ],
                     'buttons' => $buttons
                 ]
             ]
         );
 
-        $this->contextMock
+        $this->contextMock->expects($this->at(0))
             ->method('getNamespace')
             ->willReturn(Listing::NAME);
         $this->contextMock->expects($this->once())

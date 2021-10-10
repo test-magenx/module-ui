@@ -24,7 +24,7 @@ define([
      * Detect browser transition end event.
      * @return {String|undefined} - transition event.
      */
-    var transitionEvent = (function () {
+    var transitionEvent =  (function () {
         var transition,
             elementStyle = document.createElement('div').style,
             transitions = {
@@ -39,39 +39,7 @@ define([
                 return transitions[transition];
             }
         }
-    })(),
-
-    /**
-     * Implementation of zIndex used from jQuery UI
-     * @param {Element} elem
-     * @private
-     */
-    getZIndex = function (elem) {
-        var position, zIndex;
-
-        /* eslint-disable max-depth */
-        while (elem.length && elem[ 0 ] !== document) {
-            // Ignore z-index if position is set to a value where z-index is ignored by the browser
-            // This makes behavior of this function consistent across browsers
-            // WebKit always returns auto if the element is positioned
-            position = elem.css('position');
-
-            if (position === 'absolute' || position === 'relative' || position === 'fixed') {
-                // IE returns 0 when zIndex is not specified
-                // other browsers return a string
-                // we ignore the case of nested elements with an explicit value of 0
-                zIndex = parseInt(elem.css('zIndex'), 10);
-
-                if (!isNaN(zIndex) && zIndex !== 0) {
-                    return zIndex;
-                }
-            }
-            elem = elem.parent();
-        }
-
-        return 0;
-        /* eslint-enable max-depth */
-    };
+    })();
 
     /**
      * Modal Window Widget
@@ -292,15 +260,15 @@ define([
                 infelicity;
 
             if (type === 'opened' && this.options.focus) {
-                this.modal.find($(this.options.focus)).trigger('focus');
+                this.modal.find($(this.options.focus)).focus();
             } else if (type === 'opened' && !this.options.focus) {
-                this.modal.find(this.options.focusableScope).trigger('focus');
+                this.modal.find(this.options.focusableScope).focus();
             } else if (position === 'end') {
-                this.modal.find(this.options.modalCloseBtn).trigger('focus');
+                this.modal.find(this.options.modalCloseBtn).focus();
             } else if (position === 'start') {
                 infelicity = 2; //Constant for find last focusable element
                 focusableElements = this.modal.find(':focusable');
-                focusableElements.eq(focusableElements.length - infelicity).trigger('focus');
+                focusableElements.eq(focusableElements.length - infelicity).focus();
             }
         },
 
@@ -363,7 +331,7 @@ define([
         _close: function () {
             var trigger = _.bind(this._trigger, this, 'closed', this.modal);
 
-            $(this.focussedElement).trigger('focus');
+            $(this.focussedElement).focus();
             this._destroyOverlay();
             this._unsetActive();
             _.defer(trigger, this);
@@ -373,17 +341,18 @@ define([
          * Set z-index and margin for modal and overlay.
          */
         _setActive: function () {
-            var zIndex = getZIndex(this.modal),
+            var zIndex = this.modal.zIndex(),
                 baseIndex = zIndex + this._getVisibleCount();
 
             if (this.modal.data('active')) {
                 return;
             }
+
             this.modal.data('active', true);
 
-            this.overlay.css('z-index', ++baseIndex);
-            this.prevOverlayIndex = baseIndex;
-            this.modal.css('z-index', baseIndex + 1);
+            this.overlay.zIndex(++baseIndex);
+            this.prevOverlayIndex = this.overlay.zIndex();
+            this.modal.zIndex(this.overlay.zIndex() + 1);
 
             if (this._getVisibleSlideCount()) {
                 this.modal.css('marginLeft', this.options.modalLeftMargin * this._getVisibleSlideCount());
@@ -398,7 +367,7 @@ define([
             this.modal.data('active', false);
 
             if (this.overlay) {
-                this.overlay.css('z-index', this.prevOverlayIndex - 1);
+                this.overlay.zIndex(this.prevOverlayIndex - 1);
             }
         },
 

@@ -79,14 +79,9 @@ class ManagerTest extends TestCase
      */
     protected $aggregatedFileCollectorFactory;
 
-    /**
-     * @var SerializerInterface|MockObject
-     */
+    /** @var SerializerInterface|MockObject */
     private $serializer;
 
-    /**
-     * @inheritDoc
-     */
     protected function setUp(): void
     {
         $this->componentConfigProvider = $this->getMockBuilder(
@@ -108,7 +103,7 @@ class ManagerTest extends TestCase
             ArrayObjectFactory::class
         )->disableOriginalConstructor()
             ->getMock();
-        $this->arrayObjectFactory
+        $this->arrayObjectFactory->expects($this->at(0))
             ->method('create')
             ->willReturn(new \ArrayObject([]));
         $this->uiReader = $this->getMockBuilder(
@@ -152,10 +147,7 @@ class ManagerTest extends TestCase
         );
     }
 
-    /**
-    * @return void
-    */
-    public function testGetReader(): void
+    public function testGetReader()
     {
         $this->readerFactory->expects($this->once())
             ->method('create')
@@ -167,10 +159,7 @@ class ManagerTest extends TestCase
         $this->assertEquals($this->uiReader, $this->manager->getReader('some_name'));
     }
 
-    /**
-    * @return void
-    */
-    public function testPrepareDataWithoutName(): void
+    public function testPrepareDataWithoutName()
     {
         $this->expectException(LocalizedException::class);
         $this->expectExceptionMessage(
@@ -180,29 +169,10 @@ class ManagerTest extends TestCase
     }
 
     /**
-     * @return void
      * @dataProvider getComponentData()
      */
-    public function testPrepareGetData($componentName, $componentData, $isCached, $readerData, $expectedResult): void
+    public function testPrepareGetData($componentName, $componentData, $isCached, $readerData, $expectedResult)
     {
-        $this->arrayObjectFactory = $this->getMockBuilder(ArrayObjectFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->arrayObjectFactory
-            ->method('create')
-            ->willReturnOnConsecutiveCalls(new \ArrayObject([]), $componentData);
-
-        $this->manager = new Manager(
-            $this->componentConfigProvider,
-            $this->domMerger,
-            $this->readerFactory,
-            $this->arrayObjectFactory,
-            $this->aggregatedFileCollectorFactory,
-            $this->cacheConfig,
-            $this->argumentInterpreter,
-            $this->serializer
-        );
-
         $this->readerFactory->expects($this->any())
             ->method('create')
             ->with(['fileCollector' => $this->aggregatedFileCollector, 'domMerger' => $this->domMerger])
@@ -215,6 +185,9 @@ class ManagerTest extends TestCase
             ->willReturnCallback(function ($argument) {
                 return ['argument' => $argument['value']];
             });
+        $this->arrayObjectFactory->expects($this->any())
+            ->method('create')
+            ->willReturn($componentData);
         $this->cacheConfig->expects($this->any())
             ->method('load')
             ->with(Manager::CACHE_ID . '_' . $componentName)
@@ -232,21 +205,20 @@ class ManagerTest extends TestCase
     /**
      * @return array
      */
-    public function getComponentData(): array
+    public function getComponentData()
     {
         $cachedData = new \ArrayObject(
-            [
-                'test_component1' => [
-                    ManagerInterface::COMPONENT_ARGUMENTS_KEY => ['argument_name1' => ['value' => 'value1']],
-                    ManagerInterface::CHILDREN_KEY => [
-                        'custom' => [
-                            ManagerInterface::COMPONENT_ARGUMENTS_KEY => [
-                                'custom_name1' => ['value' => 'custom_value1']
-                            ],
-                            ManagerInterface::CHILDREN_KEY => []
-                        ]
-                    ]
-                ]
+            ['test_component1' => [
+                ManagerInterface::COMPONENT_ARGUMENTS_KEY => ['argument_name1' => ['value' => 'value1']],
+                ManagerInterface::CHILDREN_KEY => [
+                    'custom' => [
+                        ManagerInterface::COMPONENT_ARGUMENTS_KEY => [
+                            'custom_name1' => ['value' => 'custom_value1']
+                        ],
+                        ManagerInterface::CHILDREN_KEY => [],
+                    ],
+                ],
+            ]
             ]
         );
 
@@ -264,44 +236,38 @@ class ManagerTest extends TestCase
                                 ManagerInterface::COMPONENT_ARGUMENTS_KEY => [
                                     'custom_name1' => ['argument' => 'custom_value1']
                                 ],
-                                ManagerInterface::CHILDREN_KEY => []
+                                ManagerInterface::CHILDREN_KEY => [],
                             ]
                         ]
-                    ]
-                ]
+                    ],
+                ],
             ],
             [
                 'test_component2',
                 new \ArrayObject(
-                    [
-                        'test_component2' => [
-                            ManagerInterface::COMPONENT_ARGUMENTS_KEY => ['argument_name2' => ['value' => 'value2']],
-                            ManagerInterface::CHILDREN_KEY => [
-                                'test_component21' => [
-                                    ManagerInterface::COMPONENT_ARGUMENTS_KEY => [
-                                        'argument_name21' => ['value' => 'value21']
-                                    ],
-                                    ManagerInterface::CHILDREN_KEY => []
-                                ]
-                            ]
-                        ]
+                    ['test_component2' => [
+                        ManagerInterface::COMPONENT_ARGUMENTS_KEY => ['argument_name2' => ['value' => 'value2']],
+                        ManagerInterface::CHILDREN_KEY => [
+                            'test_component21' => [
+                                ManagerInterface::COMPONENT_ARGUMENTS_KEY => [
+                                    'argument_name21' => ['value' => 'value21']
+                                ],
+                                ManagerInterface::CHILDREN_KEY => [],
+                            ],
+                        ],
+                    ]
                     ]
                 ),
                 false,
-                [
-                    'componentGroup' => [
-                        0 => [
-                            Converter::DATA_ARGUMENTS_KEY => ['argument_name2' => ['value' => 'value2']],
-                            Converter::DATA_ATTRIBUTES_KEY => ['name' => 'attribute_name2'],
-                            'test_component21' => [
-                                0 => [
-                                    Converter::DATA_ARGUMENTS_KEY => ['argument_name21' => ['value' => 'value21']],
-                                    Converter::DATA_ATTRIBUTES_KEY => ['name' => 'attribute_name21']
-                                ]
-                            ]
-                        ]
+                ['componentGroup' => [0 => [
+                    Converter::DATA_ARGUMENTS_KEY => ['argument_name2' => ['value' => 'value2']],
+                    Converter::DATA_ATTRIBUTES_KEY => ['name' => 'attribute_name2'],
+                    'test_component21' => [0 => [
+                        Converter::DATA_ARGUMENTS_KEY => ['argument_name21' => ['value' => 'value21']],
+                        Converter::DATA_ATTRIBUTES_KEY => ['name' => 'attribute_name21'],
                     ]
-                ],
+                    ],
+                ]]],
                 [
                     'test_component2' => [
                         ManagerInterface::COMPONENT_ARGUMENTS_KEY => ['argument_name2' => ['argument' => 'value2']],
@@ -312,20 +278,19 @@ class ManagerTest extends TestCase
                                     'argument_name21' => ['argument' => 'value21']
                                 ],
                                 ManagerInterface::COMPONENT_ATTRIBUTES_KEY => ['name' => 'attribute_name21'],
-                                ManagerInterface::CHILDREN_KEY => []
-                            ]
-                        ]
-                    ]
-                ]
-            ]
+                                ManagerInterface::CHILDREN_KEY => [],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ];
     }
 
     /**
-     * @return void
      * @dataProvider getComponentDataProvider()
      */
-    public function testCreateRawComponentData($componentName, $configData, $componentData, $needEvaluate): void
+    public function testCreateRawComponentData($componentName, $configData, $componentData, $needEvaluate)
     {
         $this->componentConfigProvider->expects($this->any())
             ->method('getComponentData')
@@ -345,17 +310,17 @@ class ManagerTest extends TestCase
     /**
      * @return array
      */
-    public function getComponentDataProvider(): array
+    public function getComponentDataProvider()
     {
         return [
             [
                 'test_component1',
                 [
-                    Converter::DATA_ATTRIBUTES_KEY => ['name' => 'attribute_name1']
+                    Converter::DATA_ATTRIBUTES_KEY => ['name' => 'attribute_name1'],
                 ],
                 [
                     ManagerInterface::COMPONENT_ATTRIBUTES_KEY => ['name' => 'attribute_name1'],
-                    ManagerInterface::COMPONENT_ARGUMENTS_KEY => []
+                    ManagerInterface::COMPONENT_ARGUMENTS_KEY => [],
 
                 ],
                 false,
@@ -363,28 +328,28 @@ class ManagerTest extends TestCase
             [
                 'test_component2',
                 [
-                    Converter::DATA_ARGUMENTS_KEY => ['argument_name2' => ['value' => 'value2']]
+                    Converter::DATA_ARGUMENTS_KEY => ['argument_name2' => ['value' => 'value2']],
                 ],
                 [
                     ManagerInterface::COMPONENT_ATTRIBUTES_KEY => [],
-                    ManagerInterface::COMPONENT_ARGUMENTS_KEY => ['argument_name2' => ['value' => 'value2']]
+                    ManagerInterface::COMPONENT_ARGUMENTS_KEY => ['argument_name2' => ['value' => 'value2']],
 
                 ],
-                false
+                false,
             ],
             [
                 'test_component3',
                 [
                     Converter::DATA_ATTRIBUTES_KEY => ['name' => 'attribute_name3'],
-                    Converter::DATA_ARGUMENTS_KEY => ['argument_name3' => ['value' => 'value3']]
+                    Converter::DATA_ARGUMENTS_KEY => ['argument_name3' => ['value' => 'value3']],
                 ],
                 [
                     ManagerInterface::COMPONENT_ATTRIBUTES_KEY => ['name' => 'attribute_name3'],
-                    ManagerInterface::COMPONENT_ARGUMENTS_KEY => ['argument_name3' => ['argument' => 'value3']]
+                    ManagerInterface::COMPONENT_ARGUMENTS_KEY => ['argument_name3' => ['argument' => 'value3']],
 
                 ],
-                true
-            ]
+                true,
+            ],
         ];
     }
 }

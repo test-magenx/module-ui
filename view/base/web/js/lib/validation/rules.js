@@ -458,7 +458,7 @@ define([
                     return false;
                 }
 
-                pass = value.trim();
+                pass = $.trim(value);
 
                 if (!pass.length) {
                     return true;
@@ -476,7 +476,7 @@ define([
                     return false;
                 }
 
-                pass = value.trim();
+                pass = $.trim(value);
 
                 if (pass.length === 0) {
                     return true;
@@ -500,7 +500,7 @@ define([
                     counter = 0,
                     passwordMinLength = $(elm).data('password-min-length'),
                     passwordMinCharacterSets = $(elm).data('password-min-character-sets'),
-                    pass = v.trim(),
+                    pass = $.trim(v),
                     result = pass.length >= passwordMinLength;
 
                 if (result === false) {

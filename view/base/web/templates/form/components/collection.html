@@ -10,16 +10,16 @@
         <li class="address-list-item" outereach="elems" css="'ui-state-active': active" click="activate">
             <div class="address-list-item-actions">
                 <button class="action-delete" type="button" click="$parent.removeAddress.bind($parent, $data)">
-                    <span text="$parent.removeLabel"></span>
+                    <span text="$parent.removeLabel"/>
                 </button>
             </div>
-            <render args="previewTpl"></render>
-            <div each="getRegion('head')" render=""></div>
+            <render args="previewTpl"/>
+            <div each="getRegion('head')" render=""/>
         </li>
 
         <li class="address-list-actions last">
             <button class="scalable add" type="button" click="addChild">
-                <span text="addLabel"></span>
+                <span text="addLabel"/>
             </button>
         </li>
     </ul>
@@ -28,10 +28,10 @@
         <div class="address-item-edit-content">
             <fieldset class="admin__fieldset">
                 <legend class="admin__legend">
-                    <span text="$parent.label"></span>
+                    <span text="$parent.label"/>
                 </legend><br />
 
-                <each args="getRegion('body')" render=""></each>
+                <each args="getRegion('body')" render=""/>
             </fieldset>
         </div>
     </div>

@@ -28,7 +28,6 @@ use Magento\Ui\Model\UiComponentTypeResolver;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Magento\Framework\App\Response\Http as ResponseHttp;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -121,15 +120,12 @@ class RenderTest extends TestCase
      */
     private $escaperMock;
 
-    /**
-     * @inheritdoc
-     */
     protected function setUp(): void
     {
         $this->requestMock = $this->getMockBuilder(Http::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->responseMock = $this->getMockBuilder(ResponseHttp::class)
+        $this->responseMock = $this->getMockBuilder(\Magento\Framework\App\Response\Http::class)
             ->disableOriginalConstructor()
             ->getMock();
         $this->contextMock = $this->getMockBuilder(Context::class)
@@ -165,7 +161,9 @@ class RenderTest extends TestCase
             ['render']
         );
 
-        $this->resultJsonFactoryMock = $this->getMockBuilder(JsonFactory::class)
+        $this->resultJsonFactoryMock = $this->getMockBuilder(
+            JsonFactory::class
+        )
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -210,15 +208,12 @@ class RenderTest extends TestCase
                 'contentTypeResolver' => $this->uiComponentTypeResolverMock,
                 'resultJsonFactory' => $this->resultJsonFactoryMock,
                 'logger' => $this->loggerMock,
-                'escaper' => $this->escaperMock
+                'escaper' => $this->escaperMock,
             ]
         );
     }
 
-    /**
-     * @return void
-     */
-    public function testExecuteException(): void
+    public function testExecuteException()
     {
         $name = 'test-name';
         $renderedData = '<html>data</html>';
@@ -236,7 +231,7 @@ class RenderTest extends TestCase
 
         $jsonResultMock = $this->getMockBuilder(Json::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['setData'])
+            ->setMethods(['setData'])
             ->getMock();
 
         $this->resultJsonFactoryMock->expects($this->once())
@@ -271,10 +266,7 @@ class RenderTest extends TestCase
         $this->render->execute();
     }
 
-    /**
-     * @return void
-     */
-    public function testExecute(): void
+    public function testExecute()
     {
         $name = 'test-name';
         $renderedData = '<html>data</html>';
@@ -319,35 +311,37 @@ class RenderTest extends TestCase
      * @param array $dataProviderConfig
      * @param bool|null $isAllowed
      * @param int $authCallCount
-     *
-     * @return void
      * @dataProvider executeAjaxRequestWithoutPermissionsDataProvider
      */
-    public function testExecuteWithoutPermissions(
-        array $dataProviderConfig,
-        ?bool $isAllowed,
-        int $authCallCount = 1
-    ): void {
+    public function testExecuteWithoutPermissions(array $dataProviderConfig, $isAllowed, $authCallCount = 1)
+    {
         $name = 'test-name';
         $renderedData = '<html>data</html>';
 
         if (false === $isAllowed) {
             $jsonResultMock = $this->getMockBuilder(Json::class)
                 ->disableOriginalConstructor()
-                ->onlyMethods(['setStatusHeader', 'setData'])
+                ->setMethods(['setStatusHeader', 'setData'])
                 ->getMock();
 
-            $jsonResultMock
+            $jsonResultMock->expects($this->at(0))
                 ->method('setStatusHeader')
-                ->with(Response::STATUS_CODE_403, AbstractMessage::VERSION_11, 'Forbidden')
-                ->willReturn($jsonResultMock);
-            $jsonResultMock
+                ->with(
+                    Response::STATUS_CODE_403,
+                    AbstractMessage::VERSION_11,
+                    'Forbidden'
+                )
+                ->willReturnSelf();
+
+            $jsonResultMock->expects($this->at(1))
                 ->method('setData')
-                ->with([
-                    'error' => 'Forbidden',
-                    'errorcode' => 403
-                ])
-                ->willReturn($jsonResultMock);
+                ->with(
+                    [
+                        'error' => 'Forbidden',
+                        'errorcode' => 403
+                    ]
+                )
+                ->willReturnSelf();
 
             $this->resultJsonFactoryMock->expects($this->any())
                 ->method('create')
@@ -400,7 +394,7 @@ class RenderTest extends TestCase
     /**
      * @return array
      */
-    public function executeAjaxRequestWithoutPermissionsDataProvider(): array
+    public function executeAjaxRequestWithoutPermissionsDataProvider()
     {
         $aclResource = 'Magento_Test::index_index';
         return [
@@ -416,7 +410,7 @@ class RenderTest extends TestCase
                 'dataProviderConfig' => [],
                 'isAllowed' => null,
                 'authCallCount' => 0
-            ]
+            ],
         ];
     }
 }

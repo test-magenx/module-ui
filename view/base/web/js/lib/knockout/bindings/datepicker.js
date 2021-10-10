@@ -89,7 +89,7 @@ define([
 
                 if (!options.timeOnly) {
                     $element.datepicker('setDate', newVal);
-                    $element.trigger('blur');
+                    $element.blur();
                 }
             });
         }

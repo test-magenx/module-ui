@@ -46,16 +46,13 @@ class BookmarkManagementTest extends TestCase
      */
     protected $userContext;
 
-    /**
-     * @inheritdoc
-     */
     protected function setUp(): void
     {
         $this->bookmarkRepository = $this->getMockBuilder(BookmarkRepositoryInterface::class)
             ->getMockForAbstractClass();
         $this->filterBuilder = $this->getMockBuilder(FilterBuilder::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['create'])
+            ->setMethods(['create'])
             ->getMock();
         $this->searchCriteriaBuilder =$this->getMockBuilder(SearchCriteriaBuilder::class)
             ->disableOriginalConstructor()
@@ -70,10 +67,7 @@ class BookmarkManagementTest extends TestCase
         );
     }
 
-    /**
-     * @return void
-     */
-    public function testLoadByNamespace(): void
+    public function testLoadByNamespace()
     {
         $userId = 1;
         $namespace = 'some_namespace';
@@ -96,9 +90,12 @@ class BookmarkManagementTest extends TestCase
         );
         $searchCriteria = $this->getMockBuilder(SearchCriteriaInterface::class)
             ->getMockForAbstractClass();
-        $this->filterBuilder
+        $this->filterBuilder->expects($this->at(0))
             ->method('create')
-            ->willReturnOnConsecutiveCalls($fieldUserId, $fieldNamespace);
+            ->willReturn($fieldUserId);
+        $this->filterBuilder->expects($this->at(1))
+            ->method('create')
+            ->willReturn($fieldNamespace);
         $this->searchCriteriaBuilder->expects($this->exactly(2))
             ->method('addFilters')
             ->withConsecutive([[$fieldUserId]], [[$fieldNamespace]]);
@@ -114,10 +111,7 @@ class BookmarkManagementTest extends TestCase
         $this->assertEquals($searchResult, $this->bookmarkManagement->loadByNamespace($namespace));
     }
 
-    /**
-     * @return void
-     */
-    public function testGetByIdentifierNamespace(): void
+    public function testGetByIdentifierNamespace()
     {
         $userId = 1;
         $namespace = 'some_namespace';
@@ -152,9 +146,15 @@ class BookmarkManagementTest extends TestCase
         $bookmark->expects($this->once())->method('getId')->willReturn($bookmarkId);
         $searchCriteria = $this->getMockBuilder(SearchCriteriaInterface::class)
             ->getMockForAbstractClass();
-        $this->filterBuilder
+        $this->filterBuilder->expects($this->at(0))
             ->method('create')
-            ->willReturnOnConsecutiveCalls($fieldUserId, $fieldIdentifier, $fieldNamespace);
+            ->willReturn($fieldUserId);
+        $this->filterBuilder->expects($this->at(1))
+            ->method('create')
+            ->willReturn($fieldIdentifier);
+        $this->filterBuilder->expects($this->at(2))
+            ->method('create')
+            ->willReturn($fieldNamespace);
         $this->searchCriteriaBuilder->expects($this->exactly(3))
             ->method('addFilters')
             ->withConsecutive([[$fieldUserId]], [[$fieldIdentifier]], [[$fieldNamespace]]);

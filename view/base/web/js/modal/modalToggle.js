@@ -19,9 +19,9 @@ define([
         if (config.contentSelector) {
             content = $(config.contentSelector);
         } else if (config.content) {
-            content = $('<div></div>').html(config.content);
+            content = $('<div />').html(config.content);
         } else {
-            content = $('<div></div>');
+            content = $('<div />');
         }
 
         widget = content.modal(config);

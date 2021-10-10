@@ -168,15 +168,6 @@ define([
             this.content(content);
 
             return this;
-        },
-
-        /**
-         * Content getter
-         *
-         * @returns {String}
-         */
-        getContentUnsanitizedHtml: function () {
-            return this.content();
         }
     });
 });

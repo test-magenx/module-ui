@@ -220,7 +220,7 @@ define([
          * @returns {Object} Chainable.
          */
         initOnListingScroll: function () {
-            $(this.listingNode).on('scroll', function (e) {
+            $(this.listingNode).scroll(function (e) {
                 this.flags.listingScrolled = true;
                 this.flags.listingScrolledValue = $(e.target).scrollLeft();
             }.bind(this));
@@ -234,7 +234,7 @@ define([
          * @returns {Object} Chainable.
          */
         initOnResize: function () {
-            $(window).on('resize', function () {
+            $(window).resize(function () {
                 this.flags.resized = true;
             }.bind(this));
 

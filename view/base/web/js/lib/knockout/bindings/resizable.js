@@ -8,7 +8,8 @@ define([
     'Magento_Ui/js/lib/view/utils/async',
     'uiRegistry',
     'underscore',
-    '../template/renderer'
+    '../template/renderer',
+    'jquery-ui-modules/resizable'
 ], function (ko, $, async, registry, _, renderer) {
     'use strict';
 
@@ -138,11 +139,7 @@ define([
         init: function (element, valueAccessor, allBindings, viewModel) {
             var config = processConfig(valueAccessor(), viewModel, element);
 
-            require(['jquery-ui-modules/resizable'], function () {
-                if ($.fn.resizable) {
-                    $(element).resizable(config);
-                }
-            });
+            $(element).resizable(config);
         }
     };
 
