@@ -22,7 +22,6 @@ define([
             placeholder: $t('Search by keyword'),
             label: $t('Keyword'),
             value: '',
-            keywordUpdated: false,
             previews: [],
             chipsProvider: 'componentType = filtersChips, ns = ${ $.ns }',
             statefull: {
@@ -32,8 +31,7 @@ define([
                 value: true,
                 previews: true,
                 inputValue: true,
-                focused: true,
-                keywordUpdated: true
+                focused: true
             },
             imports: {
                 inputValue: 'value',
@@ -41,8 +39,7 @@ define([
                 focused: false
             },
             exports: {
-                value: '${ $.provider }:params.search',
-                keywordUpdated: '${ $.provider }:params.keywordUpdated'
+                value: '${ $.provider }:params.search'
             },
             modules: {
                 chips: '${ $.chipsProvider }'
@@ -127,7 +124,6 @@ define([
         apply: function (value) {
             value = value || this.inputValue;
 
-            this.keywordUpdated = this.value !== value;
             this.value = this.inputValue = value.trim();
 
             return this;

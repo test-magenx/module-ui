@@ -444,8 +444,8 @@ define([
             cfg.curResizeElem.model.width = $(cfg.curResizeElem.elems[0]).outerWidth();
             cfg.depResizeElem.model.width = $(cfg.depResizeElem.elems[0]).outerWidth();
             body.addClass(this.inResizeClass);
-            body.on('mousemove', this.mousemoveHandler);
-            $(window).on('mouseup', this.mouseupHandler);
+            body.bind('mousemove', this.mousemoveHandler);
+            $(window).bind('mouseup', this.mouseupHandler);
         },
 
         /**
@@ -528,8 +528,8 @@ define([
             this.store('storageColumnsData');
 
             body.removeClass(this.inResizeClass);
-            body.off('mousemove', this.mousemoveHandler);
-            $(window).off('mouseup', this.mouseupHandler);
+            body.unbind('mousemove', this.mousemoveHandler);
+            $(window).unbind('mouseup', this.mouseupHandler);
         },
 
         /**

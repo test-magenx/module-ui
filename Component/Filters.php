@@ -5,8 +5,6 @@
  */
 namespace Magento\Ui\Component;
 
-use Magento\Framework\App\ObjectManager;
-use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponent\ObserverInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
@@ -49,42 +47,16 @@ class Filters extends AbstractComponent implements ObserverInterface
     protected $uiComponentFactory;
 
     /**
-     * @var TimezoneInterface
-     */
-    private $localeDate;
-
-    /**
-     * Filters constructor.
-     *
-     * @param ContextInterface $context
-     * @param UiComponentFactory $uiComponentFactory
-     * @param array $components
-     * @param array $data
-     * @param TimezoneInterface|null $localeDate
+     * @inheritDoc
      */
     public function __construct(
         ContextInterface $context,
         UiComponentFactory $uiComponentFactory,
         array $components = [],
-        array $data = [],
-        ?TimezoneInterface $localeDate = null
+        array $data = []
     ) {
         parent::__construct($context, $components, $data);
         $this->uiComponentFactory = $uiComponentFactory;
-        $this->localeDate = $localeDate ?? ObjectManager::getInstance()->get(TimezoneInterface::class);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function prepare()
-    {
-        $config = $this->getData('config');
-        // Set date format pattern by current locale
-        $localeDateFormat = $this->localeDate->getDateFormat();
-        $config['options']['dateFormat'] = $localeDateFormat;
-        $this->setData('config', $config);
-        parent::prepare();
     }
 
     /**

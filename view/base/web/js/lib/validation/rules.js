@@ -836,47 +836,23 @@ define([
         ],
         'less-than-equals-to': [
             function (value, params) {
-                value = utils.parseNumber(value);
-
-                if (isNaN(parseFloat(params))) {
-                    params = $(params).val();
-                }
-
-                params = utils.parseNumber(params);
-
-                if (!isNaN(params) && !isNaN(value)) {
-                    this.lteToVal = params;
-
-                    return value <= params;
+                if ($.isNumeric(params) && $.isNumeric(value)) {
+                    return parseFloat(value) <= parseFloat(params);
                 }
 
                 return true;
             },
-            function () {
-                return $.mage.__('Please enter a value less than or equal to %s.').replace('%s', this.lteToVal);
-            }
+            $.mage.__('Please enter a value less than or equal to {0}.')
         ],
         'greater-than-equals-to': [
             function (value, params) {
-                value = utils.parseNumber(value);
-
-                if (isNaN(parseFloat(params))) {
-                    params = $(params).val();
-                }
-
-                params = utils.parseNumber(params);
-
-                if (!isNaN(params) && !isNaN(value)) {
-                    this.gteToVal = params;
-
-                    return value >= params;
+                if ($.isNumeric(params) && $.isNumeric(value)) {
+                    return parseFloat(value) >= parseFloat(params);
                 }
 
                 return true;
             },
-            function () {
-                return $.mage.__('Please enter a value greater than or equal to %s.').replace('%s', this.gteToVal);
-            }
+            $.mage.__('Please enter a value greater than or equal to {0}.')
         ],
         'validate-emails': [
             function (value) {

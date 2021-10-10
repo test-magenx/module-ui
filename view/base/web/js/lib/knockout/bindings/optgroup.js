@@ -19,6 +19,7 @@ define([
     ko.bindingHandlers.optgroup = {
         /**
          * @param {*} element
+         * @returns {Object}
          */
         init: function (element) {
             if (ko.utils.tagNameLower(element) !== 'select') {
@@ -29,6 +30,11 @@ define([
             while (element.length > 0) {
                 element.remove(0);
             }
+
+            // Ensures that the binding processor doesn't try to bind the options
+            return {
+                'controlsDescendantBindings': true
+            };
         },
 
         /**
@@ -327,4 +333,5 @@ define([
             }
         }
     };
+    ko.bindingHandlers.selectedOptions.after.push('optgroup');
 });

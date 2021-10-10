@@ -59,10 +59,7 @@ define([
          *
          * @returns {Range} Chainable.
          */
-        initialize: function (config) {
-            if (config.dateFormat) {
-                this.constructor.defaults.templates.date.pickerDefaultDateFormat = config.dateFormat;
-            }
+        initialize: function () {
             this._super()
                 .initChildren();
 
